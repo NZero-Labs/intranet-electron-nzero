@@ -1,0 +1,46 @@
+name: Release and Publish
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+    types: [closed]
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    # Only run for push or merged PRs (not for open/updated PRs)
+    if: github.event_name == 'push' || (github.event_name == 'pull_request' && github.event.pull_request.merged == true)
+    permissions:
+      contents: write # To create releases and push commits/tags
+      issues: write # To comment on issues
+      pull-requests: write # To comment on PRs
+      id-token: write # For npm provenance (if publishing to npm)
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0 # Full history for semantic-release to analyze commits
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 'lts/*' # Use the latest LTS version
+          registry-url: 'https://registry.npmjs.org' # For npm publish (if needed)
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Run semantic-release
+        run: npx semantic-release
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          NPM_TOKEN: ${{ secrets.NPM_TOKEN }} # Required if publishing to npm
+
+      - name: Run publish script
+        run: npm run publish
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

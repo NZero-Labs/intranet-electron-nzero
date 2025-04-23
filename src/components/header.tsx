@@ -44,7 +44,7 @@ export default function Header(){
           <Button type="button" variant="ghost" size="icon" onClick={() => window.ipc.send("maximizeApp")}>
             {windowState === "maximized" ? <MaximizeIcon className="size-4" /> : <MinimizeIcon className="size-4" />}
           </Button>
-          <Button type="button" variant="ghost" size="icon" onClick={() => window.ipc.send("closeApp")}>
+          <Button className="text-destructive" type="button" variant="ghost" size="icon" onClick={() => window.ipc.send("closeApp")}>
             <XIcon className="size-4" />
           </Button>
         </div>
