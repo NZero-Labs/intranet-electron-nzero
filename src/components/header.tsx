@@ -34,7 +34,7 @@ export default function Header(){
           </Button>
         </div>
         <div className="draggableContainer w-full h-full"></div>
-        <div className="flex items-center">
+        <div className="flex items-center gap-1">
           <Button className="mr-3" type="button" variant="ghost" size="icon" onClick={() => window.ipc.send("reloadApp")}>
             <Loader2Icon className="size-4" />
           </Button>
@@ -44,7 +44,7 @@ export default function Header(){
           <Button type="button" variant="ghost" size="icon" onClick={() => window.ipc.send("maximizeApp")}>
             {windowState === "maximized" ? <MaximizeIcon className="size-4" /> : <MinimizeIcon className="size-4" />}
           </Button>
-          <Button className="text-destructive" type="button" variant="ghost" size="icon" onClick={() => window.ipc.send("closeApp")}>
+          <Button type="button" variant="destructive" size="icon" onClick={() => window.ipc.send("closeApp")}>
             <XIcon className="size-4" />
           </Button>
         </div>

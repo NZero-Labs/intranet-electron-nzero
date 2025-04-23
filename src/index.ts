@@ -61,8 +61,7 @@ const createWindow = (): void => {
       session: ses,
       preload: MAIN_WINDOW_PRELOAD_WEBPACK_ENTRY,
       nodeIntegration: true,
-      contextIsolation: false,
-      allowRunningInsecureContent: true,
+      contextIsolation: false
     },
   });
   const view = new WebContentsView({
@@ -71,9 +70,7 @@ const createWindow = (): void => {
       preload: MAIN_WINDOW_PRELOAD_WEBPACK_ENTRY,
       nodeIntegration: true,
       contextIsolation: false,
-      spellcheck: true,
-      allowRunningInsecureContent: true,
-      webSecurity: false, 
+      spellcheck: true
     },
   });
   function browserViewOpening(viewPath = "") {
