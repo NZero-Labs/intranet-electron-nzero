@@ -86,7 +86,7 @@ const createWindow = (): void => {
       view.webContents.session.setSpellCheckerLanguages(['en-US', 'en', 'pt-BR']);
     }
   }
-  const handleWindowChange = () => {
+  const handleWindowChange = (type: string) => () => {
     const bounds = win.getContentBounds();
     view.setBounds({
       x: 0,
@@ -94,6 +94,8 @@ const createWindow = (): void => {
       width: bounds.width,
       height: bounds.height - HEADER_HEIGHT,
     });
+    if(type === 'restored') win.webContents.send("isRestored")
+    if(type === 'maximized') win.webContents.send("isMaximized")
   };
   function handleDownload(payload: DownloadPayloadProps) {
     const properties = payload.properties || {};
@@ -163,9 +165,9 @@ const createWindow = (): void => {
   tray.setContextMenu(trayContextMenu)
   win.webContents.send("isLoading", true);
 
-  win.on("will-resize", handleWindowChange);
-  win.on("maximize", handleWindowChange);
-  win.on("unmaximize", handleWindowChange);
+  win.on("will-resize", handleWindowChange('will-resize'));
+  win.on("maximize", handleWindowChange('maximized'));
+  win.on("unmaximize", handleWindowChange('restored'));
 
   const handleLoading = (isLoading: boolean) => () => {
     win.webContents.send("arrow-navigation", {
