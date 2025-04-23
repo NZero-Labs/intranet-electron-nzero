@@ -6,7 +6,7 @@ declare global {
     ipc: IpcRenderer
   }
 }
-import { ArrowLeftIcon, ArrowRightIcon, Loader2Icon, MaximizeIcon, MinimizeIcon, MinusIcon, XIcon } from "lucide-react";
+import { ArrowLeftIcon, ArrowRightIcon, LoaderIcon, MaximizeIcon, MinimizeIcon, MinusIcon, XIcon } from "lucide-react";
 import { useState } from "react";
 
 export default function Header(){
@@ -36,7 +36,7 @@ export default function Header(){
         <div className="draggableContainer w-full h-full"></div>
         <div className="flex items-center gap-1">
           <Button className="mr-3" type="button" variant="ghost" size="icon" onClick={() => window.ipc.send("reloadApp")}>
-            <Loader2Icon className="size-4" />
+            <LoaderIcon className="size-4" />
           </Button>
           <Button type="button" variant="ghost" size="icon" onClick={() => window.ipc.send("minimizeApp")}>
             <MinusIcon className="size-4" />
