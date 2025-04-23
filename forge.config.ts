@@ -13,6 +13,8 @@ import { rendererConfig } from './webpack.renderer.config';
 
 const config: ForgeConfig = {
   packagerConfig: {
+    name: "Intranet",
+    
     executableName: 'intranet',
     icon: './assets/icon.ico',
     asar: true,
@@ -20,7 +22,8 @@ const config: ForgeConfig = {
   rebuildConfig: {},
   makers: [
     new MakerSquirrel({
-      setupIcon: './assets/icon.ico'
+      setupIcon: './assets/icon.ico',
+      iconUrl: 'https://amaranzero.com/themes/custom/amara_theme/assets/images/favicon/favicon.ico',
     }), 
     new MakerZIP({}, ['darwin']),
     new MakerRpm({
@@ -38,7 +41,11 @@ const config: ForgeConfig = {
     new AutoUnpackNativesPlugin({}),
     new WebpackPlugin({
       mainConfig,
-      "devContentSecurityPolicy": "default-src 'self' 'unsafe-eval' 'unsafe-inline' static: http: https: ws:", 
+      devContentSecurityPolicy: "default-src 'self' 'unsafe-eval' 'unsafe-inline' data: blob: http: https: ws:;",
+      // devContentSecurityPolicy:
+      // "default-src 'self' 'unsafe-eval' 'unsafe-inline' static: http: https: ws:",
+      // contentSecurityPolicy:
+      //   "default-src 'self' 'unsafe-eval' 'unsafe-inline' data: blob: http: https: ws:;",
       renderer: {
         config: rendererConfig,
         entryPoints: [
@@ -71,7 +78,7 @@ const config: ForgeConfig = {
       config: {
         repository: {
           owner: 'NZero-Labs',
-          name: 'intranet-electron'
+          name: 'intranet-electron-nzero'
         },
         prerelease: true
       }

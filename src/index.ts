@@ -23,7 +23,7 @@ let filePath = "";
 
 
 console.log("__dirname", __dirname)
-updateElectronApp();
+// updateElectronApp();
 
 if (process.defaultApp) {
   if (process.argv.length >= 2) {
@@ -63,6 +63,7 @@ const createWindow = (): void => {
       preload: MAIN_WINDOW_PRELOAD_WEBPACK_ENTRY,
       nodeIntegration: true,
       contextIsolation: false,
+      allowRunningInsecureContent: true,
     },
   });
   const view = new WebContentsView({
@@ -72,6 +73,8 @@ const createWindow = (): void => {
       nodeIntegration: true,
       contextIsolation: false,
       spellcheck: true,
+      allowRunningInsecureContent: true,
+      webSecurity: false, 
     },
   });
   function browserViewOpening(viewPath = "") {
@@ -157,6 +160,7 @@ const createWindow = (): void => {
   const tray = new Tray(path.join(__dirname, "./assets/icon.ico"))
   tray.setToolTip('Intranet Amaranzero')
   win.loadURL(MAIN_WINDOW_WEBPACK_ENTRY);
+  browserViewOpening();
   win.contentView.addChildView(view)
   const trayContextMenu = Menu.buildFromTemplate([
     { label: 'Abrir Open DevTools', type: 'normal', click: () => view.webContents.openDevTools() }
@@ -164,9 +168,6 @@ const createWindow = (): void => {
   tray.setContextMenu(trayContextMenu)
   win.webContents.send("isLoading", true);
 
-  if (!app.isPackaged) {
-    browserViewOpening();
-  }
   win.on("will-resize", handleWindowChange);
   win.on("maximize", handleWindowChange);
   win.on("unmaximize", handleWindowChange);
@@ -196,9 +197,9 @@ const createWindow = (): void => {
       view.webContents.zoomFactor = currentZoom - 0.2;
     }
   });
-  view.webContents.on('did-fail-load', (event, errorCode, errorDescription, validatedURL) => {
-    log.error(`Failed to load ${validatedURL}: ${errorDescription} (${errorCode})`);
-  });
+  // view.webContents.on('did-fail-load', (event, errorCode, errorDescription, validatedURL) => {
+  //   log.error(`Failed to load ${validatedURL}: ${errorDescription} (${errorCode})`);
+  // });
 
   view.webContents.session.on("will-download", (event, item) => {
     if (filePath) item.setSavePath(filePath);
@@ -277,19 +278,10 @@ const createWindow = (): void => {
     win.show();
   });
 
-  view.webContents.openDevTools();
-  win.webContents.openDevTools();
+  // view.webContents.openDevTools();
+  // win.webContents.openDevTools();
 };
 
-app.on('certificate-error', (event, webContents, url, error, certificate, callback) => {
-  log.warn(`Certificate error for ${url}: ${error}`);
-  if (url.startsWith('https://10.10.10.5')) {
-    event.preventDefault();
-    callback(true); // trust it (only in dev!)
-  } else {
-    callback(false);
-  }
-});
 // This method will be called when Electron has finished
 // initialization and is ready to create browser windows.
 // Some APIs can only be used after this event occurs.
