@@ -80,7 +80,9 @@ const config: ForgeConfig = {
           owner: 'NZero-Labs',
           name: 'intranet-electron-nzero'
         },
-        prerelease: true
+        draft: false,         // publish immediately
+        prerelease: false,    // mark as a full release
+        releaseType: 'release', // ensure it's treated as a proper release
       }
     }
   ]
