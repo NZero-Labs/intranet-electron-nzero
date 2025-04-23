@@ -22,8 +22,7 @@ let rightClickText = "";
 let filePath = "";
 
 
-console.log("__dirname", __dirname)
-// updateElectronApp();
+updateElectronApp();
 
 if (process.defaultApp) {
   if (process.argv.length >= 2) {
@@ -86,7 +85,6 @@ const createWindow = (): void => {
         width: contentBounds.width,
         height: contentBounds.height - HEADER_HEIGHT,
       });
-      console.log("SITE_URL", `${SITE_URL}${viewPath}`)
       view.webContents.loadURL(`${SITE_URL}${viewPath}`);
       view.webContents.session.setSpellCheckerLanguages(['en-US', 'en', 'pt-BR']);
     }
