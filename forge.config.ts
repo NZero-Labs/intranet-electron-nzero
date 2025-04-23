@@ -13,6 +13,7 @@ import { rendererConfig } from './webpack.renderer.config';
 
 const config: ForgeConfig = {
   packagerConfig: {
+    executableName: 'intranet',
     icon: './assets/icon.ico',
     asar: true,
   },
