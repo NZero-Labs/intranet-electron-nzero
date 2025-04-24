@@ -1,6 +1,6 @@
 import { type IpcRenderer } from "electron";
-import { Button } from "./ui/button";
-import { Card, CardContent } from "./ui/card";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent } from "@/components/ui/card";
 declare global {
   interface Window {
     ipc: IpcRenderer

@@ -3,7 +3,7 @@
     "target": "ES6",
     "allowJs": true,
     "jsx": "react-jsx",
-    "module": "commonjs",
+    "module": "CommonJS",
     "skipLibCheck": true,
     "esModuleInterop": true,
     "noImplicitAny": true,
@@ -14,6 +14,8 @@
     "resolveJsonModule": true,
     "paths": {
       "*": ["node_modules/*"],
+      "@/*": ["src/renderer/*"],
+      "~/*": ["src/*"],
     }
   },
   "include": ["src/**/*"]

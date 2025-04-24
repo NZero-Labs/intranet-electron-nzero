@@ -13,14 +13,6 @@ export const plugins = [
   new CopyWebpackPlugin(
     {
       patterns: assets.map((asset) => ({
-        from: path.resolve(__dirname, 'src', asset),
-        to: path.resolve(__dirname, '.webpack/renderer', asset)
-      }))
-    }
-  ),
-  new CopyWebpackPlugin(
-    {
-      patterns: assets.map((asset) => ({
         from: path.resolve(__dirname, asset),
         to: path.resolve(__dirname, '.webpack/main', asset)
       }))

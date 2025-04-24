@@ -12,6 +12,7 @@ import { mainConfig } from './webpack.main.config';
 import { rendererConfig } from './webpack.renderer.config';
 
 const config: ForgeConfig = {
+  
   packagerConfig: {
     name: "Intranet",
     
@@ -41,7 +42,7 @@ const config: ForgeConfig = {
     new AutoUnpackNativesPlugin({}),
     new WebpackPlugin({
       mainConfig,
-      devContentSecurityPolicy: "default-src 'self' 'unsafe-eval' 'unsafe-inline' data: blob: http: https: ws:;",
+      devContentSecurityPolicy: "default-src 'self' 'unsafe-eval' 'unsafe-inline' static: data: blob: http: https: ws:;",
       // devContentSecurityPolicy:
       // "default-src 'self' 'unsafe-eval' 'unsafe-inline' static: http: https: ws:",
       // contentSecurityPolicy:
@@ -50,11 +51,12 @@ const config: ForgeConfig = {
         config: rendererConfig,
         entryPoints: [
           {
-            html: './src/index.html',
-            js: './src/renderer.ts',
+
+            html: './src/renderer/index.html',
+            js: './src/main/renderer.ts',
             name: 'main_window',
             preload: {
-              js: './src/preload.ts',
+              js: './src/main/preload.ts',
             },
           },
         ],

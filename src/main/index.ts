@@ -39,7 +39,8 @@ if (require('electron-squirrel-startup')) {
 }
 const handleProtocol = (request: GlobalRequest) => {
   const fileUrl = request.url.replace('static://', '');
-  const filePath = path.join(app.getAppPath(), '.webpack/renderer', fileUrl);
+  const filePath = path.join(app.getAppPath(), '.webpack/main', fileUrl);
+  console.log("filePath, fileUrl", filePath, fileUrl)
   return net.fetch(filePath);
 }
 const createWindow = (): void => {
@@ -158,7 +159,7 @@ const createWindow = (): void => {
   tray.setToolTip('Intranet Amaranzero')
   win.loadURL(MAIN_WINDOW_WEBPACK_ENTRY);
   browserViewOpening();
-  // win.contentView.addChildView(view)
+  win.contentView.addChildView(view)
   const trayContextMenu = Menu.buildFromTemplate([
     { label: 'Abrir Open DevTools', type: 'normal', click: () => view.webContents.openDevTools() }
   ])
@@ -276,7 +277,7 @@ const createWindow = (): void => {
   });
 
   // view.webContents.openDevTools();
-  win.webContents.openDevTools();
+  // win.webContents.openDevTools();
 };
 
 // This method will be called when Electron has finished
