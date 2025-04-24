@@ -12,7 +12,6 @@ import { mainConfig } from './webpack.main.config';
 import { rendererConfig } from './webpack.renderer.config';
 
 const config: ForgeConfig = {
-  
   packagerConfig: {
     name: "Intranet",
     
@@ -43,10 +42,6 @@ const config: ForgeConfig = {
     new WebpackPlugin({
       mainConfig,
       devContentSecurityPolicy: "default-src 'self' 'unsafe-eval' 'unsafe-inline' static: data: blob: http: https: ws:;",
-      // devContentSecurityPolicy:
-      // "default-src 'self' 'unsafe-eval' 'unsafe-inline' static: http: https: ws:",
-      // contentSecurityPolicy:
-      //   "default-src 'self' 'unsafe-eval' 'unsafe-inline' data: blob: http: https: ws:;",
       renderer: {
         config: rendererConfig,
         entryPoints: [

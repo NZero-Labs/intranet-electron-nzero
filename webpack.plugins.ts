@@ -1,4 +1,6 @@
 import type IForkTsCheckerWebpackPlugin from 'fork-ts-checker-webpack-plugin';
+// @ts-ignore
+
 import CopyWebpackPlugin from 'copy-webpack-plugin';
 import path from 'path'
 const assets = ['assets'];

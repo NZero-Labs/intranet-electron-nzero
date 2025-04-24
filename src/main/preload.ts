@@ -1,16 +1,36 @@
 // See the Electron documentation for details on how to use preload scripts:
 // https://www.electronjs.org/docs/latest/tutorial/process-model#preload-scripts
-
+import { electronAPI, type ElectronAPI } from '@electron-toolkit/preload'
 import { validateCNPJ, validateCPF } from "./brasillian-documents";
 import { clipboard, ipcRenderer } from "electron";
 
+export interface ITabsAPI {
+  new: () => Promise<number>
+  close: (id: number) => Promise<void>
+  select: (id: number) => Promise<void>
+  reorder: (tabIds: number[]) => Promise<void>
+  getAllTabIds: () => Promise<number[]>
+  getSelectedTabId: () => Promise<number>
+}
+export const tabsAPI: ITabsAPI = {
+  new: () => ipcRenderer.invoke('tabs:new'),
+  close: (id: number) => ipcRenderer.invoke('tabs:close', id),
+  select: (id: number) => ipcRenderer.invoke('tabs:select', id),
+  getAllTabIds: () => ipcRenderer.invoke('tabs:getAllTabIds'),
+  getSelectedTabId: () => ipcRenderer.invoke('tabs:getSelectedTabId'),
+  reorder: (tabIds: number[]) => ipcRenderer.invoke('tabs:reorder', tabIds),
+}
 declare global {
   interface Window {
+    electron: ElectronAPI
     ipc: typeof ipcRenderer;
+    tabs: ITabsAPI
   }
 }
 window.addEventListener("DOMContentLoaded", () => {
+  window.electron = electronAPI
   window.ipc = ipcRenderer;
+  window.tabs = tabsAPI;
 });
 function getTableSelector(element: EventTarget) {
   // Percorre os elementos pai até encontrar a tabela mais próxima
@@ -37,7 +57,7 @@ function tryToConvertStringToNumber(stringToConvert: string) {
     return numero.toString().replace(".", ",");
   };
   switch (true) {
-    case stringToConvert.startsWith("R$") || stringToConvert.endsWith("KWP"):
+    case stringToConvert?.startsWith("R$") || stringToConvert?.endsWith("KWP"):
       return converter(stringToConvert);
     case validateCPF(stringToConvert):
       return `=TEXTO("${stringToConvert}";"00000000000")`;
@@ -143,6 +163,12 @@ window.addEventListener("keypress", (e) => {
 
     default:
       break;
+  }
+});
+
+window.addEventListener('keydown', async (e) => {
+  if ((e.ctrlKey || e.metaKey) && !e.shiftKey && e.key.toLowerCase() === 'w') {
+    e.preventDefault();
   }
 });
 

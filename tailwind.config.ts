@@ -81,9 +81,6 @@ module.exports = {
           foreground: "hsl(var(--primary-best-foreground))",
         },
       },
-      fontFamily: {
-        sans: ["var(--font-geist-sans)"],
-      },
       keyframes: {
         "accordion-down": {
           from: {

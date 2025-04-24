@@ -11,7 +11,6 @@ rules.push({
     { loader: 'postcss-loader' } 
   ],
 });
-
 export const rendererConfig: Configuration = {
   module: {
     rules,

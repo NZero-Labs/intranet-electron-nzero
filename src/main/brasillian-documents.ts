@@ -111,8 +111,8 @@ export function validateCEP(cep: string) {
 }
 
 export function formatPhone(phone: string, removeSpace?: boolean) {
-  if (phone.startsWith("55") && phone.length > 11) phone = phone.substring(2)
-  if (phone.startsWith("+55")) phone = phone.substring(3)
+  if (phone?.startsWith("55") && phone.length > 11) phone = phone.substring(2)
+  if (phone?.startsWith("+55")) phone = phone.substring(3)
   return phone
     ?.replace(/\D/g, "")
     .replace(
