@@ -84,8 +84,10 @@ body {
   background-color: hsl(24 9.8% 10%);
   width: env(titlebar-area-width, 100%);
   height: env(titlebar-area-height, 40px);
-}
-.draggableContainer {
   app-region: drag;
   -webkit-app-region: drag;
+}
+.titlebar-button {
+  app-region: no-drag;
+  -webkit-app-region: no-drag;
 }
