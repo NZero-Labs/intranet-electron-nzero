@@ -1,8 +1,28 @@
-import { App, app, BrowserWindow, clipboard, dialog, ipcMain, net, Notification, protocol, Session, session } from 'electron'
+import {
+  App,
+  app,
+  BrowserWindow,
+  clipboard,
+  dialog,
+  ipcMain,
+  net,
+  Notification,
+  protocol,
+  Session,
+  session
+} from 'electron'
 import path from 'path'
 import { unlink } from 'fs'
 import { is } from '@electron-toolkit/utils'
-import { addNewTab, getSelectedTab, restoreTabs, saveTabs, setFilePath, setRightClickText, showContent } from '~/main/tabs'
+import {
+  addNewTab,
+  getSelectedTab,
+  restoreTabs,
+  saveTabs,
+  setFilePath,
+  setRightClickText,
+  showContent
+} from '~/main/tabs'
 import { createToolbar, getToolbar } from '~/main/toolbar'
 import { DownloadPayloadProps, SendNotificationProps } from '~/main/types'
 import { SITE_URL } from '~/main/url-helpers'
@@ -149,7 +169,7 @@ export async function initializeMainWindow() {
   })
   ipcMain.on('copied-table', () => {
     const toolBar = getToolbar()
-    toolBar.webContents.send("copied-table")
+    toolBar.webContents.send('copied-table')
   })
 
   ipcMain.on('send-notification', (e, notificationOptions: SendNotificationProps) => {
@@ -179,6 +199,11 @@ export async function initializeMainWindow() {
       })
       .catch(() => console.error('Error getting text'))
     setTimeout(() => abortController.abort(), 1000)
+  })
+
+  ipcMain.on('send-close-tab', () => {
+    const toolBar = getToolbar()
+    toolBar.webContents.send('close-current-tab')
   })
 }
 
@@ -232,4 +257,3 @@ export function showWindow() {
     baseWindow.show()
   }
 }
-

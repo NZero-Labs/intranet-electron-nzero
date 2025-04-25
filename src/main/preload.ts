@@ -167,6 +167,7 @@ window.addEventListener('keypress', (e) => {
 window.addEventListener('keydown', async (e) => {
   if ((e.ctrlKey || e.metaKey) && !e.shiftKey && e.key.toLowerCase() === 'w') {
     e.preventDefault()
+    ipcRenderer.send('send-close-tab')
   }
 })
 

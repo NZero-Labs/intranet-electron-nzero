@@ -8,17 +8,20 @@ import { initTabsIpcHandlers } from '~/main/tabs-handler'
 updateElectronApp({
   notifyUser: true,
   onNotifyUser(info) {
-    dialog.showMessageBox({
-      type: 'info',
-      buttons: ['Instalar agora', 'Mais tarde'],
-      title: "Atualização Disponível",
-      message:  process.platform === 'win32' ? info.releaseNotes : info.releaseName,
-      detail: "Uma nova versao do Intranet está disponível. reinicie o aplicativo para instalar a nova versão.",
-      icon: path.join(__dirname, './assets/icon.png')
-    }).then((returnValue) => {
-      if (returnValue.response === 0) autoUpdater.quitAndInstall()
-    })
-  },
+    dialog
+      .showMessageBox({
+        type: 'info',
+        buttons: ['Instalar agora', 'Mais tarde'],
+        title: 'Atualização Disponível',
+        message: process.platform === 'win32' ? info.releaseNotes : info.releaseName,
+        detail:
+          'Uma nova versao do Intranet está disponível. reinicie o aplicativo para instalar a nova versão.',
+        icon: path.join(__dirname, './assets/icon.png')
+      })
+      .then((returnValue) => {
+        if (returnValue.response === 0) autoUpdater.quitAndInstall()
+      })
+  }
 })
 
 if (process.defaultApp) {

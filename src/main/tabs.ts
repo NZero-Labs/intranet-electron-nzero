@@ -1,14 +1,15 @@
-import {
-  clipboard,
-  dialog,
-  shell,
-  WebContentsView
-} from 'electron'
+import { clipboard, dialog, shell, WebContentsView } from 'electron'
 import contextMenu from 'electron-context-menu'
 import path from 'path'
 import { getBaseWindow, getSession } from '~/main/main-window'
 import { NavigationRoutes } from '~/main/navigation-routes'
-import { getSelected, getTabs, NavigationHistoryRestory, setSelected, setTabs } from '~/main/tabs-store'
+import {
+  getSelected,
+  getTabs,
+  NavigationHistoryRestory,
+  setSelected,
+  setTabs
+} from '~/main/tabs-store'
 import { getToolbar, getToolbarHeight, resizeToolbar } from '~/main/toolbar'
 import { SITE_URL } from '~/main/url-helpers'
 
@@ -42,16 +43,16 @@ export async function addNewTab(newPath = '', bringToFront = true): Promise<numb
  */
 export function loadTabContent(
   urlPath: string,
-  { 
+  {
     navigationHistoryRestory = undefined,
-    bringToFront = false 
-  }: { 
+    bringToFront = false
+  }: {
     navigationHistoryRestory?: NavigationHistoryRestory
-    bringToFront?: boolean 
+    bringToFront?: boolean
   } = {}
 ): Promise<WebContentsView | null> {
   return new Promise((resolve) => {
-    const url = SITE_URL + (urlPath || "")
+    const url = SITE_URL + (urlPath || '')
     const baseWindow = getBaseWindow()
     if (baseWindow === null) return resolve(null)
     const ses = getSession()
@@ -129,7 +130,8 @@ export function loadTabContent(
     tabs.push(view)
 
     view.webContents.loadURL(url)
-    if(navigationHistoryRestory) view.webContents.navigationHistory.restore(navigationHistoryRestory)
+    if (navigationHistoryRestory)
+      view.webContents.navigationHistory.restore(navigationHistoryRestory)
     view.webContents.session.setSpellCheckerLanguages(['en-US', 'en', 'pt-BR'])
     resolve(view)
     const handleLoading = (isLoading: boolean) => () => {
@@ -179,7 +181,6 @@ export function loadTabContent(
     view.webContents.session.on('will-download', (event, item) => {
       if (filePath) item.setSavePath(filePath)
     })
-    
   })
 }
 
@@ -447,9 +448,9 @@ export async function restoreTabs({
   return selectedTab
 }
 
-export function setFilePath(newPath: string){
+export function setFilePath(newPath: string) {
   filePath = newPath
 }
-export function setRightClickText(text: string){
+export function setRightClickText(text: string) {
   rightClickText = text
 }

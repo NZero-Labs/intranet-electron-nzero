@@ -24,7 +24,7 @@ import { toast } from 'sonner'
 export default function Header() {
   const tabs = useBoundStore((state) => state.tabs.items)
   const updateTabs = useBoundStore((state) => state.tabs.update)
-  const selectedTab = useBoundStore((state) => state.tabs.selectedTabId)
+  const selectedTabIndex = useBoundStore((state) => state.tabs.selectedTabIndex)
   const remove = useBoundStore((state) => state.tabs.remove)
   const [canGoBack, setCanGoBack] = useState(false)
   const [canGoForward, setCanGoForward] = useState(false)
@@ -38,10 +38,10 @@ export default function Header() {
       setCanGoForward(navigationTyped.canGoForward)
     })
     window.ipc.on('isMaximized', () => setWindowState('maximized'))
-    window.ipc.on('copied-table', () => toast.success("Tabela copiada para o formato EXCEL|CSV"))
+    window.ipc.on('copied-table', () => toast.success('Tabela copiada para o formato EXCEL|CSV'))
     window.ipc.on('isRestored', () => setWindowState('minimized'))
     window.ipc.on('close-current-tab', () => {
-      remove(selectedTab)
+      remove(tabs[selectedTabIndex])
     })
     window.ipc.on('update-tab-name', (_, data) => {
       if (!data.name) return
@@ -51,14 +51,24 @@ export default function Header() {
     return () => {
       window.ipc.removeAllListeners()
     }
-  }, [selectedTab, tabs, updateTabs, remove])
+  }, [selectedTabIndex, tabs, updateTabs, remove])
   if (!window.ipc) return null
   return (
     <Card className={cn('titleBar py-0 gap-0 z-[999] rounded-b-none')}>
-      <CardContent className={cn("relative h-full flex items-center justify-between max-w-screen overflow-hidden", window.isDarwin  && "flex-row-reverse")}>
-        <div className={cn("flex items-center justify-start w-fit min-w-fit", window.isDarwin  && "flex-row-reverse")}>
+      <CardContent
+        className={cn(
+          'relative h-full flex items-center justify-between max-w-screen overflow-hidden',
+          window.isDarwin && 'flex-row-reverse'
+        )}
+      >
+        <div
+          className={cn(
+            'flex items-center justify-start w-fit min-w-fit',
+            window.isDarwin && 'flex-row-reverse'
+          )}
+        >
           <img src={'static://assets/icon.ico'} alt="Icon amaranzero" className="w-6 h-6 mr-2" />
-          <div className={cn("flex items-center justify-start", window.isDarwin  && "flex-row")}>
+          <div className={cn('flex items-center justify-start', window.isDarwin && 'flex-row')}>
             <Button
               className="titlebar-button"
               type="button"
@@ -127,7 +137,6 @@ export default function Header() {
               </Button>
             </>
           )}
-          
         </div>
       </CardContent>
     </Card>

@@ -1,4 +1,4 @@
-import { NavigationEntry } from 'electron';
+import { NavigationEntry } from 'electron'
 import Store from 'electron-store'
 
 export type NavigationHistoryRestory = {
@@ -7,9 +7,9 @@ export type NavigationHistoryRestory = {
 }
 export type TabsStoreType = {
   tabs: Array<{
-    navigationHistoryRestory: NavigationHistoryRestory;
-    url: string;
-    title: string;
+    navigationHistoryRestory: NavigationHistoryRestory
+    url: string
+    title: string
   }>
   selectedTabIndex: number
 }
