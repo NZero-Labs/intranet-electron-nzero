@@ -1,11 +1,25 @@
-import { app } from 'electron'
+import { app, autoUpdater, dialog } from 'electron'
 import { updateElectronApp } from 'update-electron-app'
 import path from 'path'
 import { electronApp, optimizer } from '@electron-toolkit/utils'
 import { initializeMainWindow } from '~/main/main-window'
 import { initTabsIpcHandlers } from '~/main/tabs-handler'
 
-updateElectronApp()
+updateElectronApp({
+  notifyUser: true,
+  onNotifyUser(info) {
+    dialog.showMessageBox({
+      type: 'info',
+      buttons: ['Instalar agora', 'Mais tarde'],
+      title: "Atualização Disponível",
+      message:  process.platform === 'win32' ? info.releaseNotes : info.releaseName,
+      detail: "Uma nova versao do Intranet está disponível. reinicie o aplicativo para instalar a nova versão.",
+      icon: path.join(__dirname, './assets/icon.png')
+    }).then((returnValue) => {
+      if (returnValue.response === 0) autoUpdater.quitAndInstall()
+    })
+  },
+})
 
 if (process.defaultApp) {
   if (process.argv.length >= 2) {
