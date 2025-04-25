@@ -39,6 +39,7 @@ const config: ForgeConfig = {
     }),
     new MakerDMG({
       // format: 'ULFO',
+      iconSize: 40,
       icon: './assets/icon.icns',
       background: './assets/logo.png'
     })
