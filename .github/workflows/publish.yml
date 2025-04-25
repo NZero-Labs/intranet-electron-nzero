@@ -27,5 +27,17 @@ jobs:
 
       - name: Publish app
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} # Needed if you're publishing to GitHub
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: npm run publish
+
+      - name: Verify DMG (macOS only)
+        if: matrix.os == 'macos-latest'
+        run: |
+          echo "🔍 Searching for DMG files..."
+          find out/make -name "*.dmg"
+
+          echo "✅ Verifying DMG..."
+          for dmg in $(find out/make -name "*.dmg"); do
+            echo "Verifying $dmg"
+            hdiutil verify "$dmg"
+          done
