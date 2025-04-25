@@ -15,7 +15,6 @@ import { rendererConfig } from './webpack.renderer.config'
 const config: ForgeConfig = {
   packagerConfig: {
     name: 'Intranet',
-
     executableName: 'intranet',
     icon: './assets/icon',
     asar: true
@@ -39,7 +38,7 @@ const config: ForgeConfig = {
       }
     }),
     new MakerDMG({
-      format: 'ULFO',
+      // format: 'ULFO',
       icon: './assets/icon.icns',
       background: './assets/logo.png'
     })
