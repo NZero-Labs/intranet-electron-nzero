@@ -30,15 +30,18 @@ export default function TabBar() {
                 onRemove={() => remove(item)}
                 canRemove={tabs.length > 1}
               />
-              {index !== (selectedTabIndex - 1) && index !== selectedTabIndex && tabs.length > 1 && (tabs.length - 1) !== index && (
-                <motion.div
-                  key={`divider-${index}`}
-                  className="w-[2px] h-5 bg-accent divisor opacity-100"
-                  initial={{ opacity: 0 }}
-                  animate={{ opacity: 1 }}
-                  exit={{ opacity: 0 }}
-                />
-              )}          
+              {index !== selectedTabIndex - 1 &&
+                index !== selectedTabIndex &&
+                tabs.length > 1 &&
+                tabs.length - 1 !== index && (
+                  <motion.div
+                    key={`divider-${index}`}
+                    className="w-[2px] h-5 bg-accent divisor opacity-100"
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    exit={{ opacity: 0 }}
+                  />
+                )}
             </>
           ))}
           {/* <motion.button
@@ -54,4 +57,3 @@ export default function TabBar() {
     </div>
   )
 }
-

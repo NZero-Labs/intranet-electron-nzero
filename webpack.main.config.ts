@@ -1,8 +1,8 @@
-import type { Configuration } from 'webpack';
+import type { Configuration } from 'webpack'
 
-import { rules } from './webpack.rules';
-import { plugins } from './webpack.plugins';
-import path from 'path';
+import { rules } from './webpack.rules'
+import { plugins } from './webpack.plugins'
+import path from 'path'
 
 export const mainConfig: Configuration = {
   /**
@@ -12,14 +12,14 @@ export const mainConfig: Configuration = {
   entry: './src/main/index.ts',
   // Put your normal webpack config below here
   module: {
-    rules,
+    rules
   },
   plugins,
   resolve: {
     alias: {
       '@': path.resolve(__dirname, 'src', 'renderer'),
-      '~': path.resolve(__dirname, 'src'),
+      '~': path.resolve(__dirname, 'src')
     },
-    extensions: ['.js', '.ts', '.jsx', '.tsx', '.css', '.json'],
-  },
-};
+    extensions: ['.js', '.ts', '.jsx', '.tsx', '.css', '.json']
+  }
+}

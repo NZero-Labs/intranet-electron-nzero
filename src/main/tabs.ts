@@ -1,4 +1,15 @@
-import { App, app, clipboard, dialog, ipcMain, Menu, Notification, shell, Tray, WebContentsView } from 'electron'
+import {
+  App,
+  app,
+  clipboard,
+  dialog,
+  ipcMain,
+  Menu,
+  Notification,
+  shell,
+  Tray,
+  WebContentsView
+} from 'electron'
 import contextMenu from 'electron-context-menu'
 import path from 'path'
 import { getBaseWindow, getSession } from '~/main/main-window'
@@ -8,18 +19,18 @@ import { getToolbar, getToolbarHeight, resizeToolbar } from '~/main/toolbar'
 import { DownloadPayloadProps, SendNotificationProps } from '~/main/types'
 import { SITE_URL } from '~/main/url-helpers'
 
-declare const MAIN_WINDOW_WEBPACK_ENTRY: string;
-declare const MAIN_WINDOW_PRELOAD_WEBPACK_ENTRY: string;
+// declare const MAIN_WINDOW_WEBPACK_ENTRY: string
+declare const MAIN_WINDOW_PRELOAD_WEBPACK_ENTRY: string
 const tabs: WebContentsView[] = []
 let selectedTab: WebContentsView | null = null
-let filePath = "";
-let rightClickText = "";
+let filePath = ''
+let rightClickText = ''
 
 /**
  * Creates and loads a new tab with the root URL.
  * @returns The ID of the new tab's web contents, or -1 if creation failed
  */
-export async function addNewTab(newPath: string = "") {
+export async function addNewTab(newPath = '') {
   const mainWindow = getBaseWindow()
   if (mainWindow === null) {
     return
@@ -54,18 +65,18 @@ export function loadTabContent(
         nodeIntegration: true,
         contextIsolation: false,
         spellcheck: true
-      },
-    });
+      }
+    })
 
     view.setBackgroundColor('#292524')
     view.webContents.on('dom-ready', () => {
       const toolBar = getToolbar()
-      const title = view.webContents.getTitle();
+      const title = view.webContents.getTitle()
       const isUrl = title?.startsWith('http') || title?.startsWith('10.10.10.5')
       toolBar.webContents.send('update-tab-title', {
-        title: isUrl ? "Carregando..." : title, 
+        title: isUrl ? 'Carregando...' : title,
         id: view.webContents.id
-      });
+      })
     })
     view.webContents.on('did-finish-load', () => {
       if (bringToFront) {
@@ -75,9 +86,9 @@ export function loadTabContent(
       const title = view.webContents.getTitle()
       const toolBar = getToolbar()
       toolBar.webContents.send('update-tab-title', {
-        title, 
+        title,
         id: view.webContents.id
-      });
+      })
       resolve(view)
     })
 
@@ -96,163 +107,164 @@ export function loadTabContent(
       showSaveImage: true,
       prepend: () => [
         {
-          label: "Copiar Texto",
+          label: 'Copiar Texto',
           visible: Boolean(rightClickText),
           click: () => {
             if (rightClickText) {
-              clipboard.writeText(rightClickText);
-              const abortController = new AbortController();
+              clipboard.writeText(rightClickText)
+              const abortController = new AbortController()
               dialog
                 .showMessageBox(null, {
-                  type: "info",
+                  type: 'info',
                   signal: abortController.signal,
-                  title: "Texto Copiado!",
-                  message: "O Texto foi copiado:",
+                  title: 'Texto Copiado!',
+                  message: 'O Texto foi copiado:',
                   detail:
                     rightClickText.length > 20
                       ? `${rightClickText.slice(0, 20)}...`
                       : rightClickText,
-                  icon: path.join(__dirname, "favicon.ico"),
+                  icon: path.join(__dirname, 'favicon.ico')
                 })
-                .catch(() => console.error("Error getting text"));
-              setTimeout(() => abortController.abort(), 1500);
+                .catch(() => console.error('Error getting text'))
+              setTimeout(() => abortController.abort(), 1500)
             }
-          },
-        },
+          }
+        }
       ],
       labels: {
-        copy: "Copiar",
-        copyImage: "Copiar imagem",
-        copyImageAddress: "Copiar endereço da imagem",
-        copyLink: "Copiar endereço do link",
-        saveImage: "Salvar imagem",
-        saveImageAs: "Salvar imagem como...",
-        selectAll: "Selecionar tudo",
-      },
-    });
+        copy: 'Copiar',
+        copyImage: 'Copiar imagem',
+        copyImageAddress: 'Copiar endereço da imagem',
+        copyLink: 'Copiar endereço do link',
+        saveImage: 'Salvar imagem',
+        saveImageAs: 'Salvar imagem como...',
+        selectAll: 'Selecionar tudo'
+      }
+    })
     tabs.push(view)
-    const tray = new Tray(path.join(__dirname, "./assets/icon.ico"))
+    const tray = new Tray(path.join(__dirname, './assets/icon.ico'))
     tray.setToolTip('Intranet Amaranzero')
     const trayContextMenu = Menu.buildFromTemplate([
       { label: 'Abrir Open DevTools', type: 'normal', click: () => view.webContents.openDevTools() }
     ])
     tray.setContextMenu(trayContextMenu)
-    view.webContents.loadURL(url);
-    view.webContents.session.setSpellCheckerLanguages(['en-US', 'en', 'pt-BR']);
+    view.webContents.loadURL(url)
+    view.webContents.session.setSpellCheckerLanguages(['en-US', 'en', 'pt-BR'])
     const handleLoading = (isLoading: boolean) => () => {
       const toolBar = getToolbar()
       if (!toolBar) return
-      toolBar.webContents.send("arrow-navigation", {
+      toolBar.webContents.send('arrow-navigation', {
         canGoBack: view.webContents.navigationHistory.canGoBack(),
-        canGoForward: view.webContents.navigationHistory.canGoForward(),
-      });
-      
-      toolBar.webContents.send("isLoading", isLoading);
+        canGoForward: view.webContents.navigationHistory.canGoForward()
+      })
+
+      toolBar.webContents.send('isLoading', isLoading)
       // if(isLoading) return
-      const title = view.webContents.getTitle();
+      const title = view.webContents.getTitle()
       const isUrl = title?.startsWith('http') || title?.startsWith('10.10.10.5')
       toolBar.webContents.send('update-tab-title', {
-        title: isUrl ? "Carregando..." : title, 
+        title: isUrl ? 'Carregando...' : title,
         id: view.webContents.id
-      });
-      
-    };
+      })
+    }
 
-    ipcMain.on("copyText", (e, text) => {
-      clipboard.writeText(text);
-      const abortController = new AbortController();
+    ipcMain.on('copyText', (e, text) => {
+      clipboard.writeText(text)
+      const abortController = new AbortController()
       dialog
         .showMessageBox(null, {
-          type: "info",
+          type: 'info',
           signal: abortController.signal,
-          title: "Texto Copiado!",
-          message: "O Texto foi copiado:",
+          title: 'Texto Copiado!',
+          message: 'O Texto foi copiado:',
           detail: text.length > 20 ? `${text.slice(0, 20)}...` : text,
-          icon: path.join(__dirname, "favicon.ico"),
+          icon: path.join(__dirname, 'favicon.ico')
         })
-        .catch(() => console.error("Error getting text"));
-      setTimeout(() => abortController.abort(), 1000);
-    });
+        .catch(() => console.error('Error getting text'))
+      setTimeout(() => abortController.abort(), 1000)
+    })
     ipcMain.on('open-new-link', async (e, url) => {
-      if(!url?.startsWith(SITE_URL)) return;
+      if (!url?.startsWith(SITE_URL)) return
       addNewTab(url.replace(SITE_URL, ''))
     })
-    view.webContents.on("did-start-loading", handleLoading(true));
-    view.webContents.on("did-stop-loading", handleLoading(false));
-    view.webContents.on("will-navigate", handleLoading(true));
-    view.webContents.on("did-navigate", handleLoading(false));
-  
-    view.webContents.zoomFactor = 1;
-    view.webContents.setVisualZoomLevelLimits(1, 5).catch(console.error);
-    view.webContents.on("zoom-changed", (_, zoomDirection) => {
-      const currentZoom = view.webContents.getZoomFactor();
-  
-      if (zoomDirection === "in") {
-        view.webContents.zoomFactor = currentZoom + 0.2;
+    view.webContents.on('did-start-loading', handleLoading(true))
+    view.webContents.on('did-stop-loading', handleLoading(false))
+    view.webContents.on('will-navigate', handleLoading(true))
+    view.webContents.on('did-navigate', handleLoading(false))
+
+    view.webContents.zoomFactor = 1
+    view.webContents.setVisualZoomLevelLimits(1, 5).catch(console.error)
+    view.webContents.on('zoom-changed', (_, zoomDirection) => {
+      const currentZoom = view.webContents.getZoomFactor()
+
+      if (zoomDirection === 'in') {
+        view.webContents.zoomFactor = currentZoom + 0.2
       }
-      if (zoomDirection === "out") {
-        view.webContents.zoomFactor = currentZoom - 0.2;
+      if (zoomDirection === 'out') {
+        view.webContents.zoomFactor = currentZoom - 0.2
       }
-    });
+    })
     // view.webContents.on('did-fail-load', (event, errorCode, errorDescription, validatedURL) => {
     //   log.error(`Failed to load ${validatedURL}: ${errorDescription} (${errorCode})`);
     // });
     function handleDownload(payload: DownloadPayloadProps) {
-      const properties = payload.properties || {};
-      const defaultPath = app.getPath((properties.directory || "documents") as Parameters<App['getPath']>[0]);
+      const properties = payload.properties || {}
+      const defaultPath = app.getPath(
+        (properties.directory || 'documents') as Parameters<App['getPath']>[0]
+      )
       const defaultFileName =
-        properties.filename ||
-        payload.url?.split("?")[0]?.split("/").pop() ||
-        "download";
-    
+        properties.filename || payload.url?.split('?')[0]?.split('/').pop() || 'download'
+
       const customURL = dialog.showSaveDialogSync({
-        defaultPath: `${defaultPath}/${defaultFileName}`,
-      });
-    
+        defaultPath: `${defaultPath}/${defaultFileName}`
+      })
+
       if (customURL) {
-        filePath = customURL;
-        view.webContents.downloadURL(payload.url);
+        filePath = customURL
+        view.webContents.downloadURL(payload.url)
       }
     }
     view.webContents.on('before-input-event', (event, input) => {
       if ((input.control || input.meta) && !input.shift && input.key.toLowerCase() === 'w') {
-        event.preventDefault(); // bloqueia o atalho
-        
+        event.preventDefault() // bloqueia o atalho
+
         const toolBar = getToolbar()
-        toolBar.webContents.send('close-current-tab');
+        toolBar.webContents.send('close-current-tab')
       }
-    });
-    view.webContents.session.on("will-download", (event, item) => {
-      if (filePath) item.setSavePath(filePath);
-    });
-    ipcMain.on("rightClickApp", (e, el) => {
-      rightClickText = el;
-    });
-    ipcMain.on("download", (e, { payload }: { payload: DownloadPayloadProps }) => handleDownload(payload));
-    ipcMain.on("reloadApp", () => view.webContents.reload());
-    ipcMain.on("backApp", () => {
+    })
+    view.webContents.session.on('will-download', (event, item) => {
+      if (filePath) item.setSavePath(filePath)
+    })
+    ipcMain.on('rightClickApp', (e, el) => {
+      rightClickText = el
+    })
+    ipcMain.on('download', (e, { payload }: { payload: DownloadPayloadProps }) =>
+      handleDownload(payload)
+    )
+    ipcMain.on('reloadApp', () => view.webContents.reload())
+    ipcMain.on('backApp', () => {
       if (view.webContents.navigationHistory.canGoBack()) {
-        view.webContents.navigationHistory.goBack();
+        view.webContents.navigationHistory.goBack()
       }
-    });
-    ipcMain.on("forwardApp", () => {
+    })
+    ipcMain.on('forwardApp', () => {
       if (view.webContents.navigationHistory.canGoForward()) {
-        view.webContents.navigationHistory.goForward();
+        view.webContents.navigationHistory.goForward()
       }
-    });
-    ipcMain.on("send-notification", (e, notificationOptions: SendNotificationProps) => {
+    })
+    ipcMain.on('send-notification', (e, notificationOptions: SendNotificationProps) => {
       try {
-        const notification = new Notification(notificationOptions);
+        const notification = new Notification(notificationOptions)
         if (notificationOptions.urlNotify) {
-          notification.on("click", () => {
+          notification.on('click', () => {
             addNewTab(notificationOptions.urlNotify.replace(SITE_URL, ''))
-          });
+          })
         }
-        notification.show();
+        notification.show()
       } catch (error) {
-        console.error("Erro ao enviar notificação:", error);
+        console.error('Erro ao enviar notificação:', error)
       }
-    });
+    })
   })
 }
 
@@ -415,7 +427,7 @@ function saveSelectedTab({ tabIndex = -1 }: { tabIndex?: number } = {}) {
   }
   const idx = tabs.findIndex((tab) => {
     if (selectedTab === null) return false
-    return tab.webContents.id === selectedTab!.webContents.id
+    return tab.webContents.id === selectedTab?.webContents.id
   })
   if (idx === -1) {
     return
@@ -461,7 +473,6 @@ export function saveTabs() {
   })
 
   setTabs(tabUrls)
-
 }
 
 /**
@@ -479,7 +490,7 @@ export async function restoreTabs({
     return loadTabContent(NavigationRoutes.root)
   }
 
-  let lastSessionTabs = getTabs()
+  const lastSessionTabs = getTabs()
   let selectedTabIndex = getSelected()
 
   if (lastSessionTabs !== null && lastSessionTabs.length > 0) {
@@ -491,13 +502,13 @@ export async function restoreTabs({
       if (i === selectedTabIndex) {
         selectedTab = await loadTabContent(lastSessionTabs[i])
         const toolBar = getToolbar()
-        if(toolBar && selectedTab) {
-          const title = selectedTab.webContents.getTitle();
+        if (toolBar && selectedTab) {
+          const title = selectedTab.webContents.getTitle()
           const isUrl = title?.startsWith('http') || title?.startsWith('10.10.10.5')
           toolBar.webContents.send('update-tab-title', {
-            title: isUrl ? "" : title, 
+            title: isUrl ? '' : title,
             id: selectedTab.webContents.id
-          });
+          })
         }
         continue
       }

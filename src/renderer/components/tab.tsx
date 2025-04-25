@@ -13,7 +13,7 @@ interface Props {
 }
 
 export const Tab = ({ item, onClick, onRemove, isSelected, canRemove }: Props) => {
-  const title = item.name || "Intranet"
+  const title = item.name || 'Intranet'
   return (
     <Reorder.Item
       value={item}
@@ -33,8 +33,7 @@ export const Tab = ({ item, onClick, onRemove, isSelected, canRemove }: Props) =
       }}
       className={cn(
         ' titlebar-button group max-w-52 bg-background text-background-foreground flex justify-between items-center flex-1 gap-6 rounded-t-[1rem] border shadow-lg w-full relative cursor-pointer select-none ronded-b-none h-full p-2 overflow-visible',
-        isSelected 
-          && 'selected bg-accent text-accent-foreground'
+        isSelected && 'selected bg-accent text-accent-foreground'
       )}
       onPointerDown={onClick}
     >
@@ -51,14 +50,16 @@ export const Tab = ({ item, onClick, onRemove, isSelected, canRemove }: Props) =
         className="absolute top-0 bottom-0 right-[0px] flex align-center items-center justify-end flex-shrink-0 pr-2"
       >
         {canRemove && (
-          <Button 
-            type="button" 
-            variant={"ghost"}
+          <Button
+            type="button"
+            variant={'ghost'}
             className={cn(
-              "remove-button size-4",
+              'remove-button size-4',
               isSelected ? 'inline-flex' : 'hidden group-hover:inline-flex',
-              !isSelected && "bg-accent text-accent-foreground hover:text-accent-foreground hover:bg-accent/80",
-              isSelected && "bg-background text-foreground hover:text-foreground hover:bg-background/80",
+              !isSelected &&
+                'bg-accent text-accent-foreground hover:text-accent-foreground hover:bg-accent/80',
+              isSelected &&
+                'bg-background text-foreground hover:text-foreground hover:bg-background/80'
             )}
             size="icon"
             onClick={(event) => {
@@ -66,7 +67,7 @@ export const Tab = ({ item, onClick, onRemove, isSelected, canRemove }: Props) =
               onRemove()
             }}
           >
-            <XIcon className={"size-3"} />
+            <XIcon className={'size-3'} />
           </Button>
         )}
       </motion.div>

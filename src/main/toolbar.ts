@@ -1,11 +1,10 @@
 import { shell, WebContentsView } from 'electron'
 import { getBaseWindow, getSession } from '~/main/main-window'
-import { closeTab, getSelectedTabId } from '~/main/tabs';
 
 const toolbarHeight = 40
 let toolbarView: WebContentsView | null = null
-declare const MAIN_WINDOW_WEBPACK_ENTRY: string;
-declare const MAIN_WINDOW_PRELOAD_WEBPACK_ENTRY: string;
+declare const MAIN_WINDOW_WEBPACK_ENTRY: string
+declare const MAIN_WINDOW_PRELOAD_WEBPACK_ENTRY: string
 
 /**
  * Creates and initializes the toolbar view for the main window.

@@ -50,6 +50,7 @@
     "css-loader": "^6.11.0",
     "electron": "35.2.0",
     "eslint": "^8.57.1",
+    "eslint-import-resolver-typescript": "^4.3.4",
     "eslint-plugin-import": "^2.31.0",
     "fork-ts-checker-webpack-plugin": "^7.3.0",
     "node-loader": "^2.1.0",
@@ -61,7 +62,7 @@
     "tailwindcss-animate": "^1.0.7",
     "ts-loader": "^9.5.2",
     "ts-node": "^10.9.2",
-    "typescript": "~4.5.4"
+    "typescript": "^5.8.3"
   },
   "dependencies": {
     "@electron-toolkit/preload": "^3.0.2",
@@ -80,6 +81,7 @@
     "immer": "^10.1.1",
     "lodash": "^4.17.21",
     "lucide-react": "^0.503.0",
+    "prettier": "^3.5.3",
     "react": "^19.1.0",
     "react-dom": "^19.1.0",
     "update-electron-app": "^3.1.1",

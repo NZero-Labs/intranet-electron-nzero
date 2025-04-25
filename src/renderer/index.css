@@ -57,7 +57,10 @@
     --novel-highlight-gray: #3a3a3a;
     --radius: 0.25rem;
 
-    --elevation-card-rest: 0px -1px 0px 0px rgba(255, 255, 255, 0.06), 0px 0px 0px 1px rgba(255, 255, 255, 0.06), 0px 0px 0px 1px rgba(39, 39, 42, 1), 0px 1px 2px 0px rgba(0, 0, 0, 0.32), 0px 2px 4px 0px rgba(0, 0, 0, 0.32);
+    --elevation-card-rest:
+      0px -1px 0px 0px rgba(255, 255, 255, 0.06), 0px 0px 0px 1px rgba(255, 255, 255, 0.06),
+      0px 0px 0px 1px rgba(39, 39, 42, 1), 0px 1px 2px 0px rgba(0, 0, 0, 0.32),
+      0px 2px 4px 0px rgba(0, 0, 0, 0.32);
     --destructive-best: 0deg 100% 12.28%;
     --destructive-best-foreground: 0deg 100% 70.3%;
     --primary-best: 142deg 30.43% 17.51%;
@@ -71,7 +74,7 @@
   }
 }
 * {
-  font-family: "Geist", sans-serif;
+  font-family: 'Geist', sans-serif;
   font-optical-sizing: auto;
 }
 .titleBar {

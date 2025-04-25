@@ -18,7 +18,7 @@ export const useBoundStore = create(
         //? We need this otherwise action (functions inside the state) will be undefined.
         return merge({}, currentState, persistedState)
       },
-      partialize: (state) =>
+      partialize: () =>
         ({
           tabs: {}
         }) as Pick<Store, 'tabs'>

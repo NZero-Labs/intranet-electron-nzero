@@ -1,4 +1,3 @@
-
 import Store from 'electron-store'
 export type TabsStoreType = {
   tabs: string[]
@@ -16,6 +15,7 @@ export const globalStore = new Store<TabsStoreType>({
  * @param tabs Array of tab urls
  */
 export function setTabs(tabs: string[]) {
+  // eslint-disable-next-line @typescript-eslint/ban-ts-comment
   // @ts-ignore
   globalStore.set('tabs', tabs)
 }
@@ -24,6 +24,7 @@ export function setTabs(tabs: string[]) {
  * Retrieves stored tabs
  */
 export function getTabs(): string[] | null {
+  // eslint-disable-next-line @typescript-eslint/ban-ts-comment
   // @ts-ignore
   const data = globalStore.get('tabs', null) as string[] | null
   if (!data) return null
@@ -35,6 +36,7 @@ export function getTabs(): string[] | null {
  * @param index Index of selected tab
  */
 export function setSelected(index: number) {
+  // eslint-disable-next-line @typescript-eslint/ban-ts-comment
   // @ts-ignore
   globalStore.set('selectedTabIndex', index)
 }
@@ -43,6 +45,7 @@ export function setSelected(index: number) {
  * Retrieves selected tab index
  */
 export function getSelected(): number {
+  // eslint-disable-next-line @typescript-eslint/ban-ts-comment
   // @ts-ignore
   const data = globalStore.get('selectedTabIndex', null) as number | null
   if (!data) return -1
