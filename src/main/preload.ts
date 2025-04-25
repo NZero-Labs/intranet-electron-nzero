@@ -29,12 +29,9 @@ declare global {
   }
 }
 window.isDarwin = process.platform === 'darwin'
-console.log("🚀 ~ window.addEventListener ~ process.platform:", process.platform)
-window.addEventListener('DOMContentLoaded', () => {
-  window.electron = electronAPI
-  window.ipc = ipcRenderer
-  window.tabs = tabsAPI
-})
+window.electron = electronAPI
+window.ipc = ipcRenderer
+window.tabs = tabsAPI
 function getTableSelector(element: EventTarget) {
   // Percorre os elementos pai até encontrar a tabela mais próxima
   while (element && (element as HTMLElement).tagName !== 'TABLE') {
@@ -132,6 +129,7 @@ window.addEventListener('contextmenu', (e) => {
     // document.execCommand("copy");
     clipboard.writeText(getSelectedText(verifyTableElement))
     window.getSelection().removeAllRanges()
+    ipcRenderer.send('copied-table')
   }
   switch ((target as HTMLElement).tagName) {
     case 'BUTTON':

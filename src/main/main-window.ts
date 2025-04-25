@@ -1,9 +1,11 @@
-import { app, BrowserWindow, ipcMain, net, protocol, Session, session } from 'electron'
+import { App, app, BrowserWindow, clipboard, dialog, ipcMain, net, Notification, protocol, Session, session } from 'electron'
 import path from 'path'
 import { unlink } from 'fs'
 import { is } from '@electron-toolkit/utils'
-import { restoreTabs, saveTabs, showContent } from '~/main/tabs'
-import { createToolbar } from '~/main/toolbar'
+import { addNewTab, getSelectedTab, restoreTabs, saveTabs, setFilePath, setRightClickText, showContent } from '~/main/tabs'
+import { createToolbar, getToolbar } from '~/main/toolbar'
+import { DownloadPayloadProps, SendNotificationProps } from '~/main/types'
+import { SITE_URL } from '~/main/url-helpers'
 
 let baseWindow: BrowserWindow | null = null
 let ses: Session | null = null
@@ -105,6 +107,79 @@ export async function initializeMainWindow() {
   baseWindow.once('ready-to-show', () => {
     baseWindow.show()
   })
+  function handleDownload(payload: DownloadPayloadProps) {
+    const properties = payload.properties || {}
+    const defaultPath = app.getPath(
+      (properties.directory || 'documents') as Parameters<App['getPath']>[0]
+    )
+    const defaultFileName =
+      properties.filename || payload.url?.split('?')[0]?.split('/').pop() || 'download'
+
+    const customURL = dialog.showSaveDialogSync({
+      defaultPath: `${defaultPath}/${defaultFileName}`
+    })
+
+    if (customURL) {
+      setFilePath(customURL)
+      const selectedTab = getSelectedTab()
+      selectedTab.webContents.downloadURL(payload.url)
+    }
+  }
+  ipcMain.on('download', (e, { payload }: { payload: DownloadPayloadProps }) =>
+    handleDownload(payload)
+  )
+  ipcMain.on('reloadApp', () => {
+    const selectedTab = getSelectedTab()
+    selectedTab?.webContents?.reload()
+  })
+  ipcMain.on('backApp', () => {
+    const selectedTab = getSelectedTab()
+    if (selectedTab?.webContents?.navigationHistory?.canGoBack()) {
+      selectedTab?.webContents?.navigationHistory?.goBack()
+    }
+  })
+  ipcMain.on('forwardApp', () => {
+    const selectedTab = getSelectedTab()
+    if (selectedTab?.webContents?.navigationHistory?.canGoForward()) {
+      selectedTab?.webContents?.navigationHistory?.goForward()
+    }
+  })
+  ipcMain.on('rightClickApp', (e, el) => {
+    setRightClickText(el)
+  })
+  ipcMain.on('copied-table', () => {
+    const toolBar = getToolbar()
+    toolBar.webContents.send("copied-table")
+  })
+
+  ipcMain.on('send-notification', (e, notificationOptions: SendNotificationProps) => {
+    try {
+      const notification = new Notification(notificationOptions)
+      if (notificationOptions.urlNotify) {
+        notification.on('click', () => {
+          addNewTab(notificationOptions.urlNotify.replace(SITE_URL, ''))
+        })
+      }
+      notification.show()
+    } catch (error) {
+      console.error('Erro ao enviar notificação:', error)
+    }
+  })
+  ipcMain.on('copyText', (e, text) => {
+    clipboard.writeText(text)
+    const abortController = new AbortController()
+    dialog
+      .showMessageBox(null, {
+        type: 'info',
+        signal: abortController.signal,
+        title: 'Texto Copiado!',
+        message: 'O Texto foi copiado:',
+        detail: text.length > 20 ? `${text.slice(0, 20)}...` : text,
+        icon: path.join(__dirname, 'favicon.ico')
+      })
+      .catch(() => console.error('Error getting text'))
+    setTimeout(() => abortController.abort(), 1000)
+  })
 }
 
 /**
@@ -157,3 +232,4 @@ export function showWindow() {
     baseWindow.show()
   }
 }
+

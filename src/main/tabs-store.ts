@@ -1,6 +1,16 @@
+import { NavigationEntry } from 'electron';
 import Store from 'electron-store'
+
+export type NavigationHistoryRestory = {
+  entries: NavigationEntry[]
+  index: number
+}
 export type TabsStoreType = {
-  tabs: string[]
+  tabs: Array<{
+    navigationHistoryRestory: NavigationHistoryRestory;
+    url: string;
+    title: string;
+  }>
   selectedTabIndex: number
 }
 export const globalStore = new Store<TabsStoreType>({
@@ -14,7 +24,7 @@ export const globalStore = new Store<TabsStoreType>({
  * Updates stored tabs
  * @param tabs Array of tab urls
  */
-export function setTabs(tabs: string[]) {
+export function setTabs(tabs: TabsStoreType['tabs']) {
   // eslint-disable-next-line @typescript-eslint/ban-ts-comment
   // @ts-ignore
   globalStore.set('tabs', tabs)
@@ -23,10 +33,10 @@ export function setTabs(tabs: string[]) {
 /**
  * Retrieves stored tabs
  */
-export function getTabs(): string[] | null {
+export function getTabs(): TabsStoreType['tabs'] | null {
   // eslint-disable-next-line @typescript-eslint/ban-ts-comment
   // @ts-ignore
-  const data = globalStore.get('tabs', null) as string[] | null
+  const data = globalStore.get('tabs', null) as TabsStoreType['tabs'] | null
   if (!data) return null
   return data
 }

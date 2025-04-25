@@ -1,10 +1,6 @@
 import {
-  App,
-  app,
   clipboard,
   dialog,
-  ipcMain,
-  Notification,
   shell,
   WebContentsView
 } from 'electron'
@@ -12,9 +8,8 @@ import contextMenu from 'electron-context-menu'
 import path from 'path'
 import { getBaseWindow, getSession } from '~/main/main-window'
 import { NavigationRoutes } from '~/main/navigation-routes'
-import { getSelected, getTabs, setSelected, setTabs } from '~/main/tabs-store'
+import { getSelected, getTabs, NavigationHistoryRestory, setSelected, setTabs } from '~/main/tabs-store'
 import { getToolbar, getToolbarHeight, resizeToolbar } from '~/main/toolbar'
-import { DownloadPayloadProps, SendNotificationProps } from '~/main/types'
 import { SITE_URL } from '~/main/url-helpers'
 
 // declare const MAIN_WINDOW_WEBPACK_ENTRY: string
@@ -47,10 +42,16 @@ export async function addNewTab(newPath = '', bringToFront = true): Promise<numb
  */
 export function loadTabContent(
   urlPath: string,
-  { bringToFront = false }: { bringToFront?: boolean } = {}
+  { 
+    navigationHistoryRestory = undefined,
+    bringToFront = false 
+  }: { 
+    navigationHistoryRestory?: NavigationHistoryRestory
+    bringToFront?: boolean 
+  } = {}
 ): Promise<WebContentsView | null> {
   return new Promise((resolve) => {
-    const url = SITE_URL + urlPath
+    const url = SITE_URL + (urlPath || "")
     const baseWindow = getBaseWindow()
     if (baseWindow === null) return resolve(null)
     const ses = getSession()
@@ -76,7 +77,6 @@ export function loadTabContent(
     view.webContents.on('did-fail-load', () => {
       resolve(null)
     })
-
     view.webContents.setWindowOpenHandler((details) => {
       if (!details.url?.startsWith(SITE_URL)) {
         shell.openExternal(details.url)
@@ -129,34 +129,20 @@ export function loadTabContent(
     tabs.push(view)
 
     view.webContents.loadURL(url)
+    if(navigationHistoryRestory) view.webContents.navigationHistory.restore(navigationHistoryRestory)
     view.webContents.session.setSpellCheckerLanguages(['en-US', 'en', 'pt-BR'])
     resolve(view)
     const handleLoading = (isLoading: boolean) => () => {
       const toolBar = getToolbar()
       if (!toolBar) return
       toolBar.webContents.send('arrow-navigation', {
-        canGoBack: view.webContents.navigationHistory.canGoBack(),
-        canGoForward: view.webContents.navigationHistory.canGoForward()
+        canGoBack: view?.webContents?.navigationHistory?.canGoBack(),
+        canGoForward: view?.webContents?.navigationHistory?.canGoForward()
       })
 
       toolBar.webContents.send('isLoading', isLoading)
+      saveTabs()
     }
-
-    ipcMain.on('copyText', (e, text) => {
-      clipboard.writeText(text)
-      const abortController = new AbortController()
-      dialog
-        .showMessageBox(null, {
-          type: 'info',
-          signal: abortController.signal,
-          title: 'Texto Copiado!',
-          message: 'O Texto foi copiado:',
-          detail: text.length > 20 ? `${text.slice(0, 20)}...` : text,
-          icon: path.join(__dirname, 'favicon.ico')
-        })
-        .catch(() => console.error('Error getting text'))
-      setTimeout(() => abortController.abort(), 1000)
-    })
     view.webContents.on('did-start-loading', handleLoading(true))
     view.webContents.on('did-stop-loading', handleLoading(false))
     view.webContents.on('will-navigate', handleLoading(true))
@@ -182,23 +168,6 @@ export function loadTabContent(
         view.webContents.zoomFactor = currentZoom - 0.2
       }
     })
-    function handleDownload(payload: DownloadPayloadProps) {
-      const properties = payload.properties || {}
-      const defaultPath = app.getPath(
-        (properties.directory || 'documents') as Parameters<App['getPath']>[0]
-      )
-      const defaultFileName =
-        properties.filename || payload.url?.split('?')[0]?.split('/').pop() || 'download'
-
-      const customURL = dialog.showSaveDialogSync({
-        defaultPath: `${defaultPath}/${defaultFileName}`
-      })
-
-      if (customURL) {
-        filePath = customURL
-        view.webContents.downloadURL(payload.url)
-      }
-    }
     view.webContents.on('before-input-event', (event, input) => {
       if ((input.control || input.meta) && !input.shift && input.key.toLowerCase() === 'w') {
         event.preventDefault() // bloqueia o atalho
@@ -210,36 +179,7 @@ export function loadTabContent(
     view.webContents.session.on('will-download', (event, item) => {
       if (filePath) item.setSavePath(filePath)
     })
-    ipcMain.on('rightClickApp', (e, el) => {
-      rightClickText = el
-    })
-    ipcMain.on('download', (e, { payload }: { payload: DownloadPayloadProps }) =>
-      handleDownload(payload)
-    )
-    ipcMain.on('reloadApp', () => view.webContents.reload())
-    ipcMain.on('backApp', () => {
-      if (view.webContents.navigationHistory.canGoBack()) {
-        view.webContents.navigationHistory.goBack()
-      }
-    })
-    ipcMain.on('forwardApp', () => {
-      if (view.webContents.navigationHistory.canGoForward()) {
-        view.webContents.navigationHistory.goForward()
-      }
-    })
-    ipcMain.on('send-notification', (e, notificationOptions: SendNotificationProps) => {
-      try {
-        const notification = new Notification(notificationOptions)
-        if (notificationOptions.urlNotify) {
-          notification.on('click', () => {
-            addNewTab(notificationOptions.urlNotify.replace(SITE_URL, ''))
-          })
-        }
-        notification.show()
-      } catch (error) {
-        console.error('Erro ao enviar notificação:', error)
-      }
-    })
+    
   })
 }
 
@@ -273,6 +213,11 @@ export function showContent(webContentsView: WebContentsView) {
   })
 
   selectedTab = webContentsView
+  const toolBar = getToolbar()
+  toolBar.webContents.send('arrow-navigation', {
+    canGoBack: selectedTab?.webContents?.navigationHistory?.canGoBack(),
+    canGoForward: selectedTab?.webContents?.navigationHistory?.canGoForward()
+  })
 
   baseWindow.contentView.addChildView(webContentsView)
 }
@@ -444,7 +389,15 @@ export function saveTabs() {
   const tabUrls = tabs.map((tab) => {
     const url = tab.webContents.getURL()
     const idx = url.indexOf('#')
-    return idx === -1 ? '/' : url.substring(idx + 1)
+    const correctUrl = idx === -1 ? '/' : url.substring(idx + 1)
+    return {
+      url: correctUrl,
+      title: tab.webContents.getTitle(),
+      navigationHistoryRestory: {
+        entries: tab.webContents.navigationHistory.getAllEntries(),
+        index: tab.webContents.navigationHistory.getActiveIndex()
+      }
+    }
   })
 
   setTabs(tabUrls)
@@ -474,11 +427,16 @@ export async function restoreTabs({
     }
 
     for (let i = 0; i < lastSessionTabs.length; i++) {
+      const lastSessionTab = lastSessionTabs[i]
       if (i === selectedTabIndex) {
-        selectedTab = await loadTabContent(lastSessionTabs[i])
+        selectedTab = await loadTabContent(lastSessionTab.url, {
+          navigationHistoryRestory: lastSessionTab.navigationHistoryRestory
+        })
         continue
       }
-      loadTabContent(lastSessionTabs[i])
+      loadTabContent(lastSessionTab.url, {
+        navigationHistoryRestory: lastSessionTab.navigationHistoryRestory
+      })
     }
   }
 
@@ -487,4 +445,11 @@ export async function restoreTabs({
   }
 
   return selectedTab
+}
+
+export function setFilePath(newPath: string){
+  filePath = newPath
+}
+export function setRightClickText(text: string){
+  rightClickText = text
 }

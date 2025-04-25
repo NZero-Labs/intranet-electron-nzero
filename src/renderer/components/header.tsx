@@ -19,6 +19,7 @@ import { useEffect, useState } from 'react'
 import Toolbar from '@/components/toolbar'
 import { useBoundStore } from '@/store/use-bound-store'
 import { cn } from '@/lib/utils'
+import { toast } from 'sonner'
 
 export default function Header() {
   const tabs = useBoundStore((state) => state.tabs.items)
@@ -26,17 +27,18 @@ export default function Header() {
   const selectedTab = useBoundStore((state) => state.tabs.selectedTabId)
   const remove = useBoundStore((state) => state.tabs.remove)
   const [canGoBack, setCanGoBack] = useState(false)
-  const [canGoFoward, setCanGoFoward] = useState(false)
+  const [canGoForward, setCanGoForward] = useState(false)
   const [windowState, setWindowState] = useState<'minimized' | 'maximized'>('minimized')
 
   useEffect(() => {
     if (!window.ipc) return null
     window.ipc.on('arrow-navigation', (_, navigation) => {
-      const navigationTyped = navigation as { canGoBack: boolean; canGoFoward: boolean }
+      const navigationTyped = navigation as { canGoBack: boolean; canGoForward: boolean }
       setCanGoBack(navigationTyped.canGoBack)
-      setCanGoFoward(navigationTyped.canGoFoward)
+      setCanGoForward(navigationTyped.canGoForward)
     })
     window.ipc.on('isMaximized', () => setWindowState('maximized'))
+    window.ipc.on('copied-table', () => toast.success("Tabela copiada para o formato EXCEL|CSV"))
     window.ipc.on('isRestored', () => setWindowState('minimized'))
     window.ipc.on('close-current-tab', () => {
       remove(selectedTab)
@@ -68,10 +70,11 @@ export default function Header() {
               <ArrowLeftIcon className="size-4" />
             </Button>
             <Button
+              className="titlebar-button"
               type="button"
               variant="ghost"
               size="icon"
-              disabled={!canGoFoward}
+              disabled={!canGoForward}
               onClick={() => window.ipc.send('forwardApp')}
             >
               <ArrowRightIcon className="size-4" />
