@@ -5,7 +5,7 @@ import { validateCNPJ, validateCPF } from './brasillian-documents'
 import { clipboard, ipcRenderer } from 'electron'
 
 export interface ITabsAPI {
-  new: () => Promise<number>
+  new: (url?: string) => Promise<number>
   close: (id: number) => Promise<void>
   select: (id: number) => Promise<void>
   reorder: (tabIds: number[]) => Promise<void>
@@ -13,7 +13,7 @@ export interface ITabsAPI {
   getSelectedTabId: () => Promise<number>
 }
 export const tabsAPI: ITabsAPI = {
-  new: () => ipcRenderer.invoke('tabs:new'),
+  new: (url?: string) => ipcRenderer.invoke('tabs:new', url),
   close: (id: number) => ipcRenderer.invoke('tabs:close', id),
   select: (id: number) => ipcRenderer.invoke('tabs:select', id),
   getAllTabIds: () => ipcRenderer.invoke('tabs:getAllTabIds'),
@@ -169,12 +169,12 @@ window.addEventListener('keydown', async (e) => {
   }
 })
 
-window.addEventListener('auxclick', (event) => {
-  event.preventDefault()
-  if (event.button === 1 && event.target instanceof HTMLAnchorElement) {
-    const href = event.target.href
-    if (href) {
-      ipcRenderer.send('open-new-link', href)
-    }
-  }
-})
+// window.addEventListener('auxclick', (event) => {
+// event.preventDefault()
+// if (event.button === 1 && event.target instanceof HTMLAnchorElement) {
+//   const href = event.target.href
+//   if (href) {
+//     ipcRenderer.send('open-new-link', href)
+//   }
+// }
+// })

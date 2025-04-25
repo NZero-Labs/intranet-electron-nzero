@@ -8,7 +8,7 @@ import {
   setSelectedTab
 } from './tabs'
 export const initTabsIpcHandlers = () => {
-  ipcMain.handle('tabs:new', () => addNewTab())
+  ipcMain.handle('tabs:new', (_, url = '') => addNewTab(url))
   ipcMain.handle('tabs:select', (_, id: number) => setSelectedTab(id))
   ipcMain.handle('tabs:getAllTabIds', () => getAllTabIds())
   ipcMain.handle('tabs:getSelectedTabId', () => getSelectedTabId())

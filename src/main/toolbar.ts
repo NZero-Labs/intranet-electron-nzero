@@ -67,6 +67,7 @@ export function createToolbar(): Promise<WebContentsView | null> {
     toolbarView.webContents.on('did-fail-load', () => {
       return resolve(null)
     })
+    // toolbarView.webContents.openDevTools()
   })
 }
 

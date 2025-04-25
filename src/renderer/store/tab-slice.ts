@@ -73,18 +73,35 @@ export const createTabSlice: StateCreator<TabsSlice, [], [], TabsSlice> = (set) 
         })
       ),
     add: async () => {
+      const id = await window.tabs.new()
+
       set(
         produce((state: TabsSlice) => {
-          const id = state.tabs.items[state.tabs.items.length - 1] + 1
+          state.tabs.selectedTabId = id
           state.tabs.items.push({
             id,
             name: ''
           })
-          state.tabs.selectedTabId = id
-          state.tabs.selectedTabIndex = state.tabs.items.length - 1
+          state.tabs.selectedTabIndex = state.tabs.items.findIndex(
+            (tab) => state.tabs.selectedTabId === tab.id
+          )
         })
       )
-      window.tabs.new()
+    },
+    update: (tab: TabInfo) => {
+      set(
+        produce((state: TabsSlice) => {
+          const index = state.tabs.items.findIndex((t) => t.id === tab.id)
+          if (index === -1) {
+            state.tabs.items.push(tab)
+            state.tabs.selectedTabIndex = state.tabs.items.length - 1
+          } else {
+            state.tabs.items[index] = tab
+            state.tabs.selectedTabIndex = index
+          }
+          state.tabs.selectedTabId = tab.id
+        })
+      )
     },
     reorder: (tabs: TabInfo[]) => {
       window.tabs.reorder(tabs.map((tab) => tab.id))

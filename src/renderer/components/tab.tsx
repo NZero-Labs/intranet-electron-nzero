@@ -32,10 +32,11 @@ export const Tab = ({ item, onClick, onRemove, isSelected, canRemove }: Props) =
         transition: { ease: 'easeInOut' }
       }}
       className={cn(
-        ' titlebar-button group max-w-52 bg-background text-background-foreground flex justify-between items-center flex-1 gap-6 rounded-t-[1rem] border shadow-lg w-full relative cursor-pointer select-none ronded-b-none h-full p-2 overflow-visible',
+        'titlebar-button group max-w-52 bg-background text-background-foreground flex justify-between items-center flex-1 gap-6 rounded-t-[1rem] border shadow-lg w-full relative cursor-pointer select-none ronded-b-none h-full p-2 overflow-visible border-none',
         isSelected && 'selected bg-accent text-accent-foreground'
       )}
       onPointerDown={onClick}
+      title={title}
     >
       <motion.span
         className={cn(

@@ -22,7 +22,7 @@ import { cn } from '@/lib/utils'
 
 export default function Header() {
   const tabs = useBoundStore((state) => state.tabs.items)
-  const setTabs = useBoundStore((state) => state.tabs.reorder)
+  const updateTabs = useBoundStore((state) => state.tabs.update)
   const selectedTab = useBoundStore((state) => state.tabs.selectedTabId)
   const remove = useBoundStore((state) => state.tabs.remove)
   const [canGoBack, setCanGoBack] = useState(false)
@@ -41,28 +41,15 @@ export default function Header() {
     window.ipc.on('close-current-tab', () => {
       remove(selectedTab)
     })
-    window.ipc.on('update-tab-title', (_, data) => {
-      if (!data.title) return
-      const newTabs = tabs.map((tab) => {
-        if (tab.id === selectedTab) {
-          return {
-            ...tab,
-            name: data.title
-          }
-        }
-        return tab
-      })
-      setTabs(newTabs)
+    window.ipc.on('update-tab-name', (_, data) => {
+      if (!data.name) return
+      updateTabs(data)
     })
 
     return () => {
-      window.ipc.removeAllListeners('arrow-navigation')
-      window.ipc.removeAllListeners('isMaximized')
-      window.ipc.removeAllListeners('isRestored')
-      window.ipc.removeAllListeners('close-current-tab')
-      window.ipc.removeAllListeners('update-tab-title')
+      window.ipc.removeAllListeners()
     }
-  }, [selectedTab, tabs, setTabs, remove])
+  }, [selectedTab, tabs, updateTabs, remove])
   if (!window.ipc) return null
   return (
     <Card className={cn('titleBar py-0 gap-0 z-[999] rounded-b-none')}>

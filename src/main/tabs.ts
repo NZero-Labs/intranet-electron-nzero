@@ -4,10 +4,8 @@ import {
   clipboard,
   dialog,
   ipcMain,
-  Menu,
   Notification,
   shell,
-  Tray,
   WebContentsView
 } from 'electron'
 import contextMenu from 'electron-context-menu'
@@ -30,14 +28,14 @@ let rightClickText = ''
  * Creates and loads a new tab with the root URL.
  * @returns The ID of the new tab's web contents, or -1 if creation failed
  */
-export async function addNewTab(newPath = '') {
+export async function addNewTab(newPath = '', bringToFront = true): Promise<number> {
   const mainWindow = getBaseWindow()
   if (mainWindow === null) {
     return
   }
 
   // load new content here
-  const newTab = await loadTabContent(newPath || NavigationRoutes.root, { bringToFront: true })
+  const newTab = await loadTabContent(newPath || NavigationRoutes.root, { bringToFront })
   if (newTab === null) return -1
   return newTab.webContents.id
 }
@@ -67,29 +65,12 @@ export function loadTabContent(
         spellcheck: true
       }
     })
-
     view.setBackgroundColor('#292524')
-    view.webContents.on('dom-ready', () => {
-      const toolBar = getToolbar()
-      const title = view.webContents.getTitle()
-      const isUrl = title?.startsWith('http') || title?.startsWith('10.10.10.5')
-      toolBar.webContents.send('update-tab-title', {
-        title: isUrl ? 'Carregando...' : title,
-        id: view.webContents.id
-      })
-    })
     view.webContents.on('did-finish-load', () => {
       if (bringToFront) {
         showContent(view)
         saveTabs()
       }
-      const title = view.webContents.getTitle()
-      const toolBar = getToolbar()
-      toolBar.webContents.send('update-tab-title', {
-        title,
-        id: view.webContents.id
-      })
-      resolve(view)
     })
 
     view.webContents.on('did-fail-load', () => {
@@ -97,7 +78,11 @@ export function loadTabContent(
     })
 
     view.webContents.setWindowOpenHandler((details) => {
-      shell.openExternal(details.url)
+      if (!details.url?.startsWith(SITE_URL)) {
+        shell.openExternal(details.url)
+      } else {
+        addNewTab(details.url.replace(SITE_URL, ''))
+      }
       return { action: 'deny' }
     })
 
@@ -142,14 +127,10 @@ export function loadTabContent(
       }
     })
     tabs.push(view)
-    const tray = new Tray(path.join(__dirname, './assets/icon.ico'))
-    tray.setToolTip('Intranet Amaranzero')
-    const trayContextMenu = Menu.buildFromTemplate([
-      { label: 'Abrir Open DevTools', type: 'normal', click: () => view.webContents.openDevTools() }
-    ])
-    tray.setContextMenu(trayContextMenu)
+
     view.webContents.loadURL(url)
     view.webContents.session.setSpellCheckerLanguages(['en-US', 'en', 'pt-BR'])
+    resolve(view)
     const handleLoading = (isLoading: boolean) => () => {
       const toolBar = getToolbar()
       if (!toolBar) return
@@ -159,13 +140,6 @@ export function loadTabContent(
       })
 
       toolBar.webContents.send('isLoading', isLoading)
-      // if(isLoading) return
-      const title = view.webContents.getTitle()
-      const isUrl = title?.startsWith('http') || title?.startsWith('10.10.10.5')
-      toolBar.webContents.send('update-tab-title', {
-        title: isUrl ? 'Carregando...' : title,
-        id: view.webContents.id
-      })
     }
 
     ipcMain.on('copyText', (e, text) => {
@@ -183,15 +157,19 @@ export function loadTabContent(
         .catch(() => console.error('Error getting text'))
       setTimeout(() => abortController.abort(), 1000)
     })
-    ipcMain.on('open-new-link', async (e, url) => {
-      if (!url?.startsWith(SITE_URL)) return
-      addNewTab(url.replace(SITE_URL, ''))
-    })
     view.webContents.on('did-start-loading', handleLoading(true))
     view.webContents.on('did-stop-loading', handleLoading(false))
     view.webContents.on('will-navigate', handleLoading(true))
     view.webContents.on('did-navigate', handleLoading(false))
-
+    view.webContents.on('page-title-updated', () => {
+      const toolBar = getToolbar()
+      const name = view.webContents.getTitle()
+      const isUrl = name?.startsWith('http') || name?.startsWith('10.10.10.5')
+      toolBar.webContents.send('update-tab-name', {
+        name: isUrl ? 'Carregando...' : name,
+        id: view.webContents.id
+      })
+    })
     view.webContents.zoomFactor = 1
     view.webContents.setVisualZoomLevelLimits(1, 5).catch(console.error)
     view.webContents.on('zoom-changed', (_, zoomDirection) => {
@@ -204,9 +182,6 @@ export function loadTabContent(
         view.webContents.zoomFactor = currentZoom - 0.2
       }
     })
-    // view.webContents.on('did-fail-load', (event, errorCode, errorDescription, validatedURL) => {
-    //   log.error(`Failed to load ${validatedURL}: ${errorDescription} (${errorCode})`);
-    // });
     function handleDownload(payload: DownloadPayloadProps) {
       const properties = payload.properties || {}
       const defaultPath = app.getPath(
@@ -501,15 +476,6 @@ export async function restoreTabs({
     for (let i = 0; i < lastSessionTabs.length; i++) {
       if (i === selectedTabIndex) {
         selectedTab = await loadTabContent(lastSessionTabs[i])
-        const toolBar = getToolbar()
-        if (toolBar && selectedTab) {
-          const title = selectedTab.webContents.getTitle()
-          const isUrl = title?.startsWith('http') || title?.startsWith('10.10.10.5')
-          toolBar.webContents.send('update-tab-title', {
-            title: isUrl ? '' : title,
-            id: selectedTab.webContents.id
-          })
-        }
         continue
       }
       loadTabContent(lastSessionTabs[i])

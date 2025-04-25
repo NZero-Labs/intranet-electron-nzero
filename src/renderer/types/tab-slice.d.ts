@@ -31,6 +31,11 @@ export interface TabsSlice {
     remove: (tab: TabInfo) => void
 
     /**
+     * Updates a tab
+     */
+    update: (tab: TabInfo) => void
+
+    /**
      * Creates a new tab.
      */
     add: () => void

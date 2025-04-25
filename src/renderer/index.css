@@ -91,7 +91,3 @@
   app-region: no-drag;
   -webkit-app-region: no-drag;
 }
-
-.group-tab-bar:hover .divisor {
-  opacity: 0;
-}
