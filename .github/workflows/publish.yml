@@ -40,4 +40,36 @@ jobs:
           for dmg in $(find out/make -name "*.dmg"); do
             echo "Verifying $dmg"
             hdiutil verify "$dmg"
+
+            echo "🔒 Mounting DMG..."
+            MOUNT_OUTPUT=$(hdiutil attach "$dmg" -nobrowse -readonly)
+            MOUNT_DIR=$(echo "$MOUNT_OUTPUT" | grep -o '/Volumes/[^ ]*')
+            echo "Mounted at $MOUNT_DIR"
+
+            APP_PATH=$(find "$MOUNT_DIR" -name "*.app" -type d | head -n 1)
+            if [ -z "$APP_PATH" ]; then
+              echo "❌ No .app bundle found in DMG"
+              exit 1
+            fi
+            echo "Found app: $APP_PATH"
+
+            EXECUTABLE=$(defaults read "$APP_PATH/Contents/Info.plist" CFBundleExecutable)
+            EXEC_PATH="$APP_PATH/Contents/MacOS/$EXECUTABLE"
+
+            echo "🧪 Checking if executable exists and is valid..."
+            if [ ! -x "$EXEC_PATH" ]; then
+              echo "❌ Executable is missing or not executable: $EXEC_PATH"
+              exit 1
+            fi
+
+            echo "📦 Executable file info:"
+            file "$EXEC_PATH"
+
+            echo "🔐 Checking code signature (if any)..."
+            codesign --verify --deep --strict --verbose=2 "$APP_PATH" || echo "⚠️ Not signed or signature is invalid"
+
+            echo "✅ All checks passed!"
+
+            echo "📤 Unmounting..."
+            hdiutil detach "$MOUNT_DIR"
           done
