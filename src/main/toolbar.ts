@@ -24,7 +24,7 @@ export function createToolbar(): Promise<WebContentsView | null> {
     toolbarView = new WebContentsView({
       webPreferences: {
         session: ses,
-        devTools: false,
+        devTools: true,
         preload: MAIN_WINDOW_PRELOAD_WEBPACK_ENTRY,
         nodeIntegration: true,
         contextIsolation: false
@@ -67,7 +67,7 @@ export function createToolbar(): Promise<WebContentsView | null> {
     toolbarView.webContents.on('did-fail-load', () => {
       return resolve(null)
     })
-    // toolbarView.webContents.openDevTools()
+    toolbarView.webContents.openDevTools()
   })
 }
 

@@ -53,28 +53,30 @@ export default function Header() {
   if (!window.ipc) return null
   return (
     <Card className={cn('titleBar py-0 gap-0 z-[999] rounded-b-none')}>
-      <CardContent className="relative h-full flex items-center justify-between max-w-screen overflow-hidden">
-        <div className="flex items-center justify-start w-fit min-w-fit">
+      <CardContent className={cn("relative h-full flex items-center justify-between max-w-screen overflow-hidden", window.isDarwin  && "flex-row-reverse")}>
+        <div className={cn("flex items-center justify-start w-fit min-w-fit", window.isDarwin  && "flex-row-reverse")}>
           <img src={'static://assets/icon.ico'} alt="Icon amaranzero" className="w-6 h-6 mr-2" />
-          <Button
-            className="titlebar-button"
-            type="button"
-            variant="ghost"
-            size="icon"
-            disabled={!canGoBack}
-            onClick={() => window.ipc.send('backApp')}
-          >
-            <ArrowLeftIcon className="size-4" />
-          </Button>
-          <Button
-            type="button"
-            variant="ghost"
-            size="icon"
-            disabled={!canGoFoward}
-            onClick={() => window.ipc.send('forwardApp')}
-          >
-            <ArrowRightIcon className="size-4" />
-          </Button>
+          <div className={cn("flex items-center justify-start", window.isDarwin  && "flex-row")}>
+            <Button
+              className="titlebar-button"
+              type="button"
+              variant="ghost"
+              size="icon"
+              disabled={!canGoBack}
+              onClick={() => window.ipc.send('backApp')}
+            >
+              <ArrowLeftIcon className="size-4" />
+            </Button>
+            <Button
+              type="button"
+              variant="ghost"
+              size="icon"
+              disabled={!canGoFoward}
+              onClick={() => window.ipc.send('forwardApp')}
+            >
+              <ArrowRightIcon className="size-4" />
+            </Button>
+          </div>
         </div>
         <Toolbar />
         <div className="flex items-center gap-1 w-fit min-w-fit">
@@ -87,37 +89,42 @@ export default function Header() {
           >
             <LoaderIcon className="size-4" />
           </Button>
-          <Button
-            className="titlebar-button"
-            type="button"
-            variant="ghost"
-            size="icon"
-            onClick={() => window.ipc.send('minimizeApp')}
-          >
-            <MinusIcon className="size-4" />
-          </Button>
-          <Button
-            className="titlebar-button"
-            type="button"
-            variant="ghost"
-            size="icon"
-            onClick={() => window.ipc.send('maximizeApp')}
-          >
-            {windowState === 'maximized' ? (
-              <MinimizeIcon className="size-4" />
-            ) : (
-              <MaximizeIcon className="size-4" />
-            )}
-          </Button>
-          <Button
-            className="titlebar-button"
-            type="button"
-            variant="destructive"
-            size="icon"
-            onClick={() => window.ipc.send('closeApp')}
-          >
-            <XIcon className="size-4" />
-          </Button>
+          {!window.isDarwin && (
+            <>
+              <Button
+                className="titlebar-button"
+                type="button"
+                variant="ghost"
+                size="icon"
+                onClick={() => window.ipc.send('minimizeApp')}
+              >
+                <MinusIcon className="size-4" />
+              </Button>
+              <Button
+                className="titlebar-button"
+                type="button"
+                variant="ghost"
+                size="icon"
+                onClick={() => window.ipc.send('maximizeApp')}
+              >
+                {windowState === 'maximized' ? (
+                  <MinimizeIcon className="size-4" />
+                ) : (
+                  <MaximizeIcon className="size-4" />
+                )}
+              </Button>
+              <Button
+                className="titlebar-button"
+                type="button"
+                variant="destructive"
+                size="icon"
+                onClick={() => window.ipc.send('closeApp')}
+              >
+                <XIcon className="size-4" />
+              </Button>
+            </>
+          )}
+          
         </div>
       </CardContent>
     </Card>

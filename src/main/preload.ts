@@ -25,8 +25,11 @@ declare global {
     electron: ElectronAPI
     ipc: typeof ipcRenderer
     tabs: ITabsAPI
+    isDarwin: boolean
   }
 }
+window.isDarwin = process.platform === 'darwin'
+console.log("🚀 ~ window.addEventListener ~ process.platform:", process.platform)
 window.addEventListener('DOMContentLoaded', () => {
   window.electron = electronAPI
   window.ipc = ipcRenderer
