@@ -11,7 +11,7 @@ import {
   setTabs
 } from '~/main/tabs-store'
 import { getToolbar, getToolbarHeight, resizeToolbar } from '~/main/toolbar'
-import { SITE_URL } from '~/main/url-helpers'
+import { POWER_BI, SITE_URL } from '~/main/url-helpers'
 
 // declare const MAIN_WINDOW_WEBPACK_ENTRY: string
 declare const MAIN_WINDOW_PRELOAD_WEBPACK_ENTRY: string
@@ -60,7 +60,7 @@ export function loadTabContent(
     const view = new WebContentsView({
       webPreferences: {
         session: ses,
-        devTools: false,
+        devTools: true,
         preload: MAIN_WINDOW_PRELOAD_WEBPACK_ENTRY,
         nodeIntegration: true,
         contextIsolation: false,
@@ -80,6 +80,11 @@ export function loadTabContent(
     })
     view.webContents.setWindowOpenHandler((details) => {
       if (!details.url?.startsWith(SITE_URL)) {
+        if (details.url?.startsWith(POWER_BI) || details.url === 'about:blank') {
+          return {
+            action: 'allow'
+          }
+        }
         shell.openExternal(details.url)
       } else {
         addNewTab(details.url.replace(SITE_URL, ''))
