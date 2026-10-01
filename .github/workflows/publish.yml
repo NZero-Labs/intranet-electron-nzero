@@ -5,21 +5,73 @@ on:
     branches: [main]
   workflow_dispatch:
 
+# Um release por vez: dois pushes seguidos não geram a mesma versão duas vezes.
+concurrency:
+  group: publish
+  cancel-in-progress: false
+
 jobs:
+  version:
+    # O commit de versão é enviado com GITHUB_TOKEN e não dispara o workflow de novo.
+    if: "!startsWith(github.event.head_commit.message, 'chore(release)')"
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    outputs:
+      tag: ${{ steps.bump.outputs.tag }}
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      # Conventional commits desde a última tag: feat -> minor, "!"/BREAKING CHANGE -> major, resto -> patch.
+      - name: Bump version
+        id: bump
+        run: |
+          LAST_TAG=$(git describe --tags --abbrev=0 --match 'v*' 2>/dev/null || true)
+          LOG=$(git log ${LAST_TAG:+$LAST_TAG..}HEAD --format=%B)
+
+          if echo "$LOG" | grep -qE '^[a-z]+(\(.+\))?!:|BREAKING CHANGE'; then
+            BUMP=major
+          elif echo "$LOG" | grep -qE '^feat(\(.+\))?:'; then
+            BUMP=minor
+          else
+            BUMP=patch
+          fi
+
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          TAG=$(npm version "$BUMP" -m "chore(release): %s [skip ci]")
+          git push --follow-tags origin HEAD:main
+
+          echo "Versão: $LAST_TAG -> $TAG ($BUMP)"
+          echo "tag=$TAG" >> "$GITHUB_OUTPUT"
+
   publish:
+    needs: version
     runs-on: ${{ matrix.os }}
+    permissions:
+      contents: write
     strategy:
       matrix:
         os: [windows-latest, ubuntu-latest, macos-latest]
 
     steps:
       - name: Checkout code
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ needs.version.outputs.tag }}
 
       - name: Setup Node.js
-        uses: actions/setup-node@v3
+        uses: actions/setup-node@v4
         with:
-          node-version: 18
+          node-version: 20
           cache: 'npm'
 
       - name: Install dependencies
