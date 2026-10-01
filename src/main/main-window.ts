@@ -23,6 +23,7 @@ import {
   setRightClickText,
   showContent
 } from '~/main/tabs'
+import { initDisplayMediaHandler } from '~/main/display-media'
 import { createToolbar, getToolbar } from '~/main/toolbar'
 import { DownloadPayloadProps, SendNotificationProps } from '~/main/types'
 import { SITE_URL } from '~/main/url-helpers'
@@ -43,6 +44,7 @@ export async function initializeMainWindow() {
   protocol.handle('static', handleProtocol)
   ses = session.fromPartition('persist:myprofile')
   ses.protocol.handle('static', handleProtocol)
+  initDisplayMediaHandler(ses)
   // Create the browser window.
   const icon = path.join(__dirname, './assets/icon.ico')
   baseWindow = new BrowserWindow({

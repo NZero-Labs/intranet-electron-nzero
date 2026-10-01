@@ -118,6 +118,8 @@ function getSelectedText(table: EventTarget) {
 }
 
 window.addEventListener('contextmenu', (e) => {
+  // Eventos sintéticos (assistência remota) não devem copiar para a área de transferência do usuário.
+  if (!e.isTrusted) return
   // e.preventDefault();
   const target = e.target
   const verifyTableElement = getTableSelector(target)
@@ -151,6 +153,7 @@ window.addEventListener('contextmenu', (e) => {
 })
 
 window.addEventListener('keypress', (e) => {
+  if (!e.isTrusted) return
   switch (e.code) {
     case 'F5':
       ipcRenderer.send('reloadApp')
@@ -165,6 +168,8 @@ window.addEventListener('keypress', (e) => {
 })
 
 window.addEventListener('keydown', async (e) => {
+  // Atalhos do app (fechar aba) só pelo teclado real, nunca pela assistência remota.
+  if (!e.isTrusted) return
   if ((e.ctrlKey || e.metaKey) && !e.shiftKey && e.key.toLowerCase() === 'w') {
     e.preventDefault()
     ipcRenderer.send('send-close-tab')
